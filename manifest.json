@@ -1,0 +1,39 @@
+{
+  "name": "Memory Palace",
+  "short_name": "Palace",
+  "description": "Memorize anything using the ancient Method of Loci. Create palaces, place items in rooms, and practice with spaced repetition.",
+  "scope": "/",
+  "start_url": "/memory-palace/",
+  "display": "standalone",
+  "theme_color": "#0d1117",
+  "background_color": "#0d1117",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/memory-palace/icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/memory-palace/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/memory-palace/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["education", "productivity"],
+  "screenshots": [
+    {
+      "src": "/memory-palace/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}

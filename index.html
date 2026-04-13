@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0d1117">
+    <meta name="description" content="Memory Palace: Memorize anything using the ancient Method of Loci.">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%230d1117' width='180' height='180'/></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>Memory Palace</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d1117;
+            color: #e6edf3;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        header {
+            background-color: #161b22;
+            border-bottom: 2px solid #c4a882;
+            padding: 1rem;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #c4a882;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+
+        h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #c4a882;
+            margin: 1.5rem 0 1rem 0;
+        }
+
+        h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #c4a882;
+        }
+
+        button, .btn {
+            background-color: #c4a882;
+            color: #0d1117;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        button:hover, .btn:hover {
+            background-color: #d4b892;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(196, 168, 130, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.secondary {
+            background-color: #30363d;
+            color: #c4a882;
+            border: 1px solid #c4a882;
+        }
+
+        button.secondary:hover {
+            background-color: #3d444d;
+        }
+
+        input, textarea, select {
+            background-color: #161b22;
+            color: #e6edf3;
+            border: 1px solid #30363d;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #c4a882;
+            box-shadow: 0 0 0 3px rgba(196, 168, 130, 0.2);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .card {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: #c4a882;
+            box-shadow: 0 4px 12px rgba(196, 168, 130, 0.1);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .stat-box {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #c4a882;
+            font-family: 'Cormorant Garamond', serif;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #8b949e;
+            margin-top: 0.5rem;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .room-list {
+            margin-top: 1rem;
+        }
+
+        .room-item {
+            background-color: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .room-item:hover {
+            border-color: #c4a882;
+            transform: translateX(4px);
+        }
+
+        .room-item.active {
+            background-color: rgba(196, 168, 130, 0.1);
+            border-color: #c4a882;
+        }
+
+        .room-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .item-count {
+            font-size: 0.85rem;
+            color: #8b949e;
+            background-color: #30363d;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+        }
+
+        .item-list {
+            margin-top: 1rem;
+        }
+
+        .item-card {
+            background-color: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .item-content {
+            flex-grow: 1;
+        }
+
+        .item-text {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .item-emoji {
+            font-size: 1.5rem;
+            margin-right: 0.75rem;
+        }
+
+        .item-meta {
+            font-size: 0.85rem;
+            color: #8b949e;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .item-actions button {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+            justify-content: center;
+        }
+
+        .nav-buttons button {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .nav-buttons button.active {
+            background-color: #c4a882;
+            color: #0d1117;
+        }
+
+        .onboarding-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .onboarding-content {
+            background-color: #161b22;
+            border: 2px solid #c4a882;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            text-align: center;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .onboarding-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: #c4a882;
+            font-size: 2rem;
+            cursor: pointer;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .onboarding-close:hover {
+            background-color: rgba(196, 168, 130, 0.1);
+        }
+
+        .feature-list {
+            text-align: left;
+            margin: 1.5rem 0;
+            font-size: 0.95rem;
+        }
+
+        .feature-list li {
+            margin-bottom: 0.75rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #c4a882;
+            font-weight: bold;
+        }
+
+        .practice-card {
+            background-color: #0d1117;
+            border: 2px solid #c4a882;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            margin: 1.5rem 0;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .practice-room {
+            font-size: 0.85rem;
+            color: #8b949e;
+            margin-bottom: 0.5rem;
+        }
+
+        .practice-item-text {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #c4a882;
+            margin: 1rem 0;
+            word-break: break-word;
+        }
+
+        .practice-emoji {
+            font-size: 4rem;
+            margin: 1rem 0;
+        }
+
+        .practice-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        .practice-actions button {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #30363d;
+            border-radius: 4px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #c4a882;
+            transition: width 0.3s ease;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #8b949e;
+        }
+
+        .empty-state h3 {
+            color: #c4a882;
+            margin-bottom: 1rem;
+        }
+
+        .info-button {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #c4a882;
+            color: #0d1117;
+            border: none;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(196, 168, 130, 0.3);
+            transition: all 0.3s ease;
+            z-index: 500;
+        }
+
+        .info-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(196, 168, 130, 0.4);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: #161b22;
+            border: 2px solid #c4a882;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 95%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: #c4a882;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .success-message {
+            background-color: rgba(196, 168, 130, 0.2);
+            border: 1px solid #c4a882;
+            color: #c4a882;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            h2 {
+                font-size: 1.3rem;
+            }
+
+            .container {
+                padding: 0.75rem;
+            }
+
+            .card {
+                padding: 1rem;
+            }
+
+            .stats {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .nav-buttons button {
+                padding: 0.5rem 1rem;
+                font-size: 0.875rem;
+            }
+
+            .practice-item-text {
+                font-size: 1.5rem;
+            }
+
+            .practice-emoji {
+                font-size: 3rem;
+            }
+        }
+
+        .hint {
+            font-size: 0.85rem;
+            color: #8b949e;
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+
+        .delete-confirm {
+            background-color: #da3633;
+            color: white;
+        }
+
+        .delete-confirm:hover {
+            background-color: #da3633;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🏛️ Memory Palace</h1>
+    </header>
+
+    <div class="container">
+        <div class="nav-buttons">
+            <button class="nav-btn active" data-section="palaces">Palaces</button>
+            <button class="nav-btn" data-section="practice">Practice</button>
+            <button class="nav-btn" data-section="stats">Stats</button>
+        </div>
+
+        <!-- Palaces Section -->
+        <div id="palaces" class="section active">
+            <div class="card">
+                <h2>My Palaces</h2>
+                <p style="margin-bottom: 1rem; color: #8b949e;">Create palaces or edit existing ones. Each palace contains rooms filled with memorable items.</p>
+                <button onclick="showCreatePalaceModal()">+ New Palace</button>
+            </div>
+
+            <div id="palace-list" class="room-list"></div>
+        </div>
+
+        <!-- Practice Section -->
+        <div id="practice" class="section">
+            <div class="card">
+                <h2>Practice Mode</h2>
+                <p style="margin-bottom: 1rem; color: #8b949e;">Walk through your palaces and recall items. Mark items as correct or reveal to check yourself.</p>
+            </div>
+            <div id="practice-container"></div>
+        </div>
+
+        <!-- Stats Section -->
+        <div id="stats" class="section">
+            <div class="card">
+                <h2>Statistics</h2>
+                <div class="stats">
+                    <div class="stat-box">
+                        <div class="stat-value" id="stat-palaces">0</div>
+                        <div class="stat-label">Palaces</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="stat-items">0</div>
+                        <div class="stat-label">Total Items</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="stat-mastered">0</div>
+                        <div class="stat-label">Mastered</div>
+                    </div>
+                </div>
+            </div>
+            <div id="stats-detail" class="card"></div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="createPalaceModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('createPalaceModal')">×</button>
+            <h2>Create New Palace</h2>
+            <input type="text" id="palaceName" placeholder="Palace name (e.g., 'The Colosseum')" maxlength="50">
+            <textarea id="palaceDescription" placeholder="Description (optional)" maxlength="200" rows="3"></textarea>
+            <button onclick="createPalace()">Create Palace</button>
+            <button class="secondary" onclick="closeModal('createPalaceModal')">Cancel</button>
+        </div>
+    </div>
+
+    <div id="editPalaceModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('editPalaceModal')">×</button>
+            <h2 id="editPalaceTitle">Edit Palace</h2>
+            <div id="palace-details"></div>
+            <button onclick="deletePalace()" class="delete-confirm">Delete Palace</button>
+            <button class="secondary" onclick="closeModal('editPalaceModal')">Close</button>
+        </div>
+    </div>
+
+    <div id="addRoomModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('addRoomModal')">×</button>
+            <h2>Add Room</h2>
+            <input type="text" id="roomName" placeholder="Room name (e.g., 'Entrance')" maxlength="50">
+            <button onclick="addRoom()">Add Room</button>
+            <button class="secondary" onclick="closeModal('addRoomModal')">Cancel</button>
+        </div>
+    </div>
+
+    <div id="addItemModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('addItemModal')">×</button>
+            <h2>Add Item to Room</h2>
+            <input type="text" id="itemText" placeholder="What to memorize?" maxlength="100">
+            <input type="text" id="itemEmoji" placeholder="Emoji marker (optional, 1 char)" maxlength="1">
+            <p class="hint">Emoji helps you visualize the item in the room</p>
+            <button onclick="addItem()">Add Item</button>
+            <button class="secondary" onclick="closeModal('addItemModal')">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Onboarding Overlay -->
+    <div id="onboarding" class="onboarding-overlay">
+        <button class="onboarding-close" onclick="closeOnboarding()">×</button>
+        <div class="onboarding-content">
+            <h2>Welcome to Memory Palace</h2>
+            <p style="margin: 1rem 0; color: #8b949e;">Master the ancient Method of Loci. Memorize anything by placing it in imaginary rooms.</p>
+
+            <h3 style="margin-top: 1.5rem; text-align: center;">How It Works</h3>
+            <ul class="feature-list">
+                <li><strong>Create Palaces:</strong> Build named memory journeys (temples, houses, castles)</li>
+                <li><strong>Add Rooms:</strong> Divide each palace into distinct locations</li>
+                <li><strong>Place Items:</strong> Associate what you want to memorize with vivid room details</li>
+                <li><strong>Practice:</strong> Walk through rooms and recall items</li>
+                <li><strong>Repeat:</strong> Spaced repetition at 1, 3, 7, 14, 30 days strengthens memory</li>
+            </ul>
+
+            <p style="margin: 1.5rem 0 1rem 0; font-weight: 600; color: #c4a882;">Try the Demo Palace first to see how it works!</p>
+            <button onclick="loadDemoData(); closeOnboarding();">Load Demo: 7 Wonders</button>
+            <button class="secondary" onclick="closeOnboarding()">Skip & Start</button>
+        </div>
+    </div>
+
+    <!-- Info Button -->
+    <button class="info-button" onclick="openOnboarding()" title="Show info">ℹ</button>
+
+    <script>
+        // ============ STATE ============
+        let currentPalaceId = null;
+        let currentRoomId = null;
+        let practiceState = null;
+
+        // ============ INITIALIZATION ============
+        document.addEventListener('DOMContentLoaded', () => {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js').catch(e => console.log('SW error:', e));
+            }
+
+            const hasVisited = localStorage.getItem('memory-palace-visited');
+            if (!hasVisited) {
+                localStorage.setItem('memory-palace-visited', 'true');
+            } else {
+                document.getElementById('onboarding').style.display = 'none';
+            }
+
+            setupNavigation();
+            renderPalaces();
+            updateStats();
+        });
+
+        // ============ NAVIGATION ============
+        function setupNavigation() {
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const section = e.target.dataset.section;
+                    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                    e.target.classList.add('active');
+                    document.getElementById(section).classList.add('active');
+
+                    if (section === 'practice') {
+                        renderPracticeMode();
+                    } else if (section === 'stats') {
+                        renderStats();
+                    }
+                });
+            });
+        }
+
+        // ============ STORAGE HELPERS ============
+        function getPalaces() {
+            return JSON.parse(localStorage.getItem('memory-palaces') || '[]');
+        }
+
+        function savePalaces(palaces) {
+            localStorage.setItem('memory-palaces', JSON.stringify(palaces));
+        }
+
+        function getPalace(id) {
+            return getPalaces().find(p => p.id === id);
+        }
+
+        function generateId() {
+            return '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // ============ PALACE MANAGEMENT ============
+        function createPalace() {
+            const name = document.getElementById('palaceName').value.trim();
+            const description = document.getElementById('palaceDescription').value.trim();
+
+            if (!name) {
+                alert('Palace name is required');
+                return;
+            }
+
+            const palaces = getPalaces();
+            palaces.push({
+                id: generateId(),
+                name: name,
+                description: description,
+                rooms: [],
+                createdAt: new Date().toISOString(),
+                stats: { itemsRevealed: 0, itemsMastered: 0, streak: 0 }
+            });
+
+            savePalaces(palaces);
+            closeModal('createPalaceModal');
+            document.getElementById('palaceName').value = '';
+            document.getElementById('palaceDescription').value = '';
+            renderPalaces();
+        }
+
+        function deletePalace() {
+            if (!confirm('Delete this palace? All rooms and items will be lost.')) return;
+
+            const palaces = getPalaces();
+            const filtered = palaces.filter(p => p.id !== currentPalaceId);
+            savePalaces(filtered);
+            closeModal('editPalaceModal');
+            currentPalaceId = null;
+            renderPalaces();
+        }
+
+        function editPalaceOpen(palaceId) {
+            currentPalaceId = palaceId;
+            const palace = getPalace(palaceId);
+            document.getElementById('editPalaceTitle').textContent = palace.name;
+
+            let html = '<div class="card">';
+            html += `<h3>${palace.name}</h3>`;
+            if (palace.description) {
+                html += `<p style="color: #8b949e; margin-bottom: 1rem;">${palace.description}</p>`;
+            }
+
+            html += '<div style="margin: 1.5rem 0;"><button onclick="showAddRoomModal()" style="width: 100%;">+ Add Room</button></div>';
+            html += '<div class="room-list">';
+
+            palace.rooms.forEach(room => {
+                html += `<div class="room-item">
+                    <div class="room-title">
+                        <span onclick="selectRoom('${palaceId}', '${room.id}')" style="flex: 1; cursor: pointer;">📍 ${room.name}</span>
+                        <span class="item-count">${room.items.length}</span>
+                        <button class="secondary" style="padding: 0.5rem 1rem; font-size: 0.875rem;" onclick="deleteRoom('${palaceId}', '${room.id}')">Delete</button>
+                    </div>`;
+
+                if (room.items.length > 0) {
+                    html += '<div class="item-list">';
+                    room.items.forEach(item => {
+                        html += `<div style="font-size: 0.85rem; padding: 0.5rem 0; border-top: 1px solid #30363d; padding-top: 0.75rem; display: flex; gap: 0.5rem; align-items: center;">
+                            ${item.emoji ? `<span style="font-size: 1.2rem;">${item.emoji}</span>` : ''}
+                            <span>${item.text}</span>
+                            <span style="color: #8b949e; margin-left: auto; font-size: 0.75rem;">
+                                ${item.nextReview ? 'Review: ' + new Date(item.nextReview).toLocaleDateString() : 'New'}
+                            </span>
+                            <button class="secondary" style="padding: 0.25rem 0.75rem; font-size: 0.75rem;" onclick="deleteItem('${palaceId}', '${room.id}', '${item.id}')">×</button>
+                        </div>`;
+                    });
+                    html += '</div>';
+                }
+
+                html += '</div>';
+            });
+
+            html += '</div></div>';
+            document.getElementById('palace-details').innerHTML = html;
+            document.getElementById('editPalaceModal').classList.add('active');
+        }
+
+        function selectRoom(palaceId, roomId) {
+            currentPalaceId = palaceId;
+            currentRoomId = roomId;
+            document.getElementById('addItemModal').classList.add('active');
+        }
+
+        function showAddRoomModal() {
+            document.getElementById('roomName').value = '';
+            document.getElementById('addRoomModal').classList.add('active');
+        }
+
+        function addRoom() {
+            const name = document.getElementById('roomName').value.trim();
+            if (!name) {
+                alert('Room name is required');
+                return;
+            }
+
+            const palaces = getPalaces();
+            const palace = palaces.find(p => p.id === currentPalaceId);
+            if (!palace) return;
+
+            palace.rooms.push({
+                id: generateId(),
+                name: name,
+                items: []
+            });
+
+            savePalaces(palaces);
+            closeModal('addRoomModal');
+            editPalaceOpen(currentPalaceId);
+        }
+
+        function deleteRoom(palaceId, roomId) {
+            if (!confirm('Delete this room? All items will be lost.')) return;
+
+            const palaces = getPalaces();
+            const palace = palaces.find(p => p.id === palaceId);
+            palace.rooms = palace.rooms.filter(r => r.id !== roomId);
+            savePalaces(palaces);
+            editPalaceOpen(palaceId);
+        }
+
+        function showAddRoomModal() {
+            document.getElementById('roomName').value = '';
+            document.getElementById('addRoomModal').classList.add('active');
+        }
+
+        function showAddItemModal(palaceId, roomId) {
+            currentPalaceId = palaceId;
+            currentRoomId = roomId;
+            document.getElementById('itemText').value = '';
+            document.getElementById('itemEmoji').value = '';
+            document.getElementById('addItemModal').classList.add('active');
+        }
+
+        function addItem() {
+            const text = document.getElementById('itemText').value.trim();
+            const emoji = document.getElementById('itemEmoji').value.trim();
+
+            if (!text) {
+                alert('Item text is required');
+                return;
+            }
+
+            const palaces = getPalaces();
+            const palace = palaces.find(p => p.id === currentPalaceId);
+            const room = palace.rooms.find(r => r.id === currentRoomId);
+
+            room.items.push({
+                id: generateId(),
+                text: text,
+                emoji: emoji || null,
+                createdAt: new Date().toISOString(),
+                nextReview: new Date().toISOString(),
+                level: 0,
+                correct: 0,
+                incorrect: 0
+            });
+
+            savePalaces(palaces);
+            closeModal('addItemModal');
+            editPalaceOpen(currentPalaceId);
+        }
+
+        function deleteItem(palaceId, roomId, itemId) {
+            if (!confirm('Delete this item?')) return;
+
+            const palaces = getPalaces();
+            const palace = palaces.find(p => p.id === palaceId);
+            const room = palace.rooms.find(r => r.id === roomId);
+            room.items = room.items.filter(i => i.id !== itemId);
+            savePalaces(palaces);
+            editPalaceOpen(palaceId);
+        }
+
+        // ============ RENDERING ============
+        function renderPalaces() {
+            const palaces = getPalaces();
+            const container = document.getElementById('palace-list');
+
+            if (palaces.length === 0) {
+                container.innerHTML = '<div class="empty-state"><h3>No Palaces Yet</h3><p>Create your first palace to start memorizing!</p></div>';
+                return;
+            }
+
+            let html = '';
+            palaces.forEach(palace => {
+                const itemCount = palace.rooms.reduce((acc, r) => acc + r.items.length, 0);
+                html += `
+                    <div class="card" onclick="editPalaceOpen('${palace.id}')">
+                        <div class="room-title">
+                            <span>🏛️ ${palace.name}</span>
+                            <span class="item-count">${palace.rooms.length} rooms · ${itemCount} items</span>
+                        </div>
+                        ${palace.description ? `<p style="color: #8b949e; margin-top: 0.5rem; font-size: 0.95rem;">${palace.description}</p>` : ''}
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // ============ PRACTICE MODE ============
+        function renderPracticeMode() {
+            const palaces = getPalaces();
+            const container = document.getElementById('practice-container');
+
+            if (palaces.length === 0) {
+                container.innerHTML = '<div class="empty-state"><h3>No Palaces to Practice</h3><p>Create a palace first to start practicing.</p></div>';
+                return;
+            }
+
+            let html = '<div class="card"><h3>Select Palace</h3><div class="room-list">';
+
+            palaces.forEach(palace => {
+                const itemsDue = countItemsDue(palace);
+                html += `
+                    <div class="room-item" onclick="startPractice('${palace.id}')">
+                        <div class="room-title">
+                            <span>🏛️ ${palace.name}</span>
+                            <span class="item-count">${itemsDue} due</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div></div>';
+            container.innerHTML = html;
+        }
+
+        function countItemsDue(palace) {
+            const now = new Date();
+            return palace.rooms.reduce((acc, room) => {
+                return acc + room.items.filter(item => new Date(item.nextReview) <= now).length;
+            }, 0);
+        }
+
+        function startPractice(palaceId) {
+            const palace = getPalace(palaceId);
+            const allItems = [];
+
+            palace.rooms.forEach(room => {
+                room.items.forEach(item => {
+                    if (new Date(item.nextReview) <= new Date()) {
+                        allItems.push({
+                            palaceId: palaceId,
+                            roomId: room.id,
+                            roomName: room.name,
+                            ...item
+                        });
+                    }
+                });
+            });
+
+            if (allItems.length === 0) {
+                alert('No items due for review in this palace!');
+                return;
+            }
+
+            practiceState = {
+                palaceId: palaceId,
+                items: allItems,
+                currentIndex: 0,
+                correct: 0,
+                incorrect: 0
+            };
+
+            showPracticeItem();
+        }
+
+        function showPracticeItem() {
+            if (practiceState.currentIndex >= practiceState.items.length) {
+                showPracticeSummary();
+                return;
+            }
+
+            const item = practiceState.items[practiceState.currentIndex];
+            const container = document.getElementById('practice-container');
+
+            let html = `
+                <div class="practice-card">
+                    <div class="practice-room">📍 ${item.roomName}</div>
+                    <div style="color: #8b949e; font-size: 0.9rem;">Item ${practiceState.currentIndex + 1} of ${practiceState.items.length}</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${((practiceState.currentIndex) / practiceState.items.length) * 100}%"></div>
+                    </div>
+                    <div style="margin: 2rem 0;">
+                        <p style="color: #8b949e; margin-bottom: 1rem;">Recall this item:</p>
+                        ${item.emoji ? `<div class="practice-emoji">${item.emoji}</div>` : ''}
+                        <div id="practice-reveal" style="display: none;">
+                            <div class="practice-item-text">${item.text}</div>
+                        </div>
+                    </div>
+                    <div class="practice-actions">
+                        <button onclick="revealItem()">Reveal</button>
+                        <button class="secondary" onclick="markIncorrect()">✗ Miss</button>
+                        <button class="secondary" onclick="markCorrect()">✓ Got it</button>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function revealItem() {
+            document.getElementById('practice-reveal').style.display = 'block';
+        }
+
+        function markCorrect() {
+            const item = practiceState.items[practiceState.currentIndex];
+            const palaces = getPalaces();
+            const palace = palaces.find(p => p.id === practiceState.palaceId);
+            const room = palace.rooms.find(r => r.id === item.roomId);
+            const storageItem = room.items.find(i => i.id === item.id);
+
+            storageItem.correct = (storageItem.correct || 0) + 1;
+            storageItem.level = (storageItem.level || 0) + 1;
+
+            const intervals = [1, 3, 7, 14, 30];
+            const daysToAdd = intervals[Math.min(storageItem.level - 1, intervals.length - 1)];
+            const nextDate = new Date();
+            nextDate.setDate(nextDate.getDate() + daysToAdd);
+            storageItem.nextReview = nextDate.toISOString();
+
+            savePalaces(palaces);
+            practiceState.correct++;
+            practiceState.currentIndex++;
+            showPracticeItem();
+        }
+
+        function markIncorrect() {
+            const item = practiceState.items[practiceState.currentIndex];
+            const palaces = getPalaces();
+            const palace = palaces.find(p => p.id === practiceState.palaceId);
+            const room = palace.rooms.find(r => r.id === item.roomId);
+            const storageItem = room.items.find(i => i.id === item.id);
+
+            storageItem.incorrect = (storageItem.incorrect || 0) + 1;
+            storageItem.level = Math.max(0, (storageItem.level || 1) - 1);
+            storageItem.nextReview = new Date().toISOString();
+
+            savePalaces(palaces);
+            practiceState.incorrect++;
+            practiceState.currentIndex++;
+            showPracticeItem();
+        }
+
+        function showPracticeSummary() {
+            const container = document.getElementById('practice-container');
+            const accuracy = practiceState.correct + practiceState.incorrect > 0
+                ? Math.round((practiceState.correct / (practiceState.correct + practiceState.incorrect)) * 100)
+                : 0;
+
+            let html = `
+                <div class="practice-card" style="min-height: auto;">
+                    <h3 style="margin-bottom: 1.5rem;">Practice Complete!</h3>
+                    <div class="stats">
+                        <div class="stat-box">
+                            <div class="stat-value">${practiceState.correct}</div>
+                            <div class="stat-label">Correct</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value">${practiceState.incorrect}</div>
+                            <div class="stat-label">Missed</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value">${accuracy}%</div>
+                            <div class="stat-label">Accuracy</div>
+                        </div>
+                    </div>
+                    <button onclick="renderPracticeMode()" style="margin-top: 1.5rem; width: 100%;">Back to Practice</button>
+                </div>
+            `;
+
+            container.innerHTML = html;
+            practiceState = null;
+        }
+
+        // ============ STATS ============
+        function updateStats() {
+            const palaces = getPalaces();
+            let totalItems = 0;
+            let mastered = 0;
+
+            palaces.forEach(palace => {
+                palace.rooms.forEach(room => {
+                    room.items.forEach(item => {
+                        totalItems++;
+                        if ((item.level || 0) >= 5) mastered++;
+                    });
+                });
+            });
+
+            document.getElementById('stat-palaces').textContent = palaces.length;
+            document.getElementById('stat-items').textContent = totalItems;
+            document.getElementById('stat-mastered').textContent = mastered;
+        }
+
+        function renderStats() {
+            const palaces = getPalaces();
+            let html = '<h3 style="margin-bottom: 1rem;">Palace Breakdown</h3>';
+
+            if (palaces.length === 0) {
+                html = '<p style="color: #8b949e;">No palaces yet. Create one to see statistics.</p>';
+            } else {
+                palaces.forEach(palace => {
+                    let totalItems = 0;
+                    let masteredItems = 0;
+
+                    palace.rooms.forEach(room => {
+                        room.items.forEach(item => {
+                            totalItems++;
+                            if ((item.level || 0) >= 5) masteredItems++;
+                        });
+                    });
+
+                    html += `
+                        <div class="card" style="margin-bottom: 1rem;">
+                            <h3>${palace.name}</h3>
+                            <p style="color: #8b949e; margin-bottom: 1rem;">${totalItems} items • ${masteredItems} mastered</p>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${totalItems > 0 ? (masteredItems / totalItems) * 100 : 0}%"></div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('stats-detail').innerHTML = html;
+        }
+
+        // ============ MODALS ============
+        function showCreatePalaceModal() {
+            document.getElementById('createPalaceModal').classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function openOnboarding() {
+            document.getElementById('onboarding').style.display = 'flex';
+        }
+
+        function closeOnboarding() {
+            document.getElementById('onboarding').style.display = 'none';
+        }
+
+        // ============ DEMO DATA ============
+        function loadDemoData() {
+            const demoData = {
+                id: generateId(),
+                name: '7 Wonders of the Ancient World',
+                description: 'A classic memory palace. Walk through ancient sites and recall the wonders.',
+                rooms: [
+                    {
+                        id: generateId(),
+                        name: 'The Egyptian Desert',
+                        items: [
+                            { id: generateId(), text: 'Great Pyramid of Giza', emoji: '⬜', createdAt: new Date().toISOString(), nextReview: new Date().toISOString(), level: 0, correct: 0, incorrect: 0 }
+                        ]
+                    },
+                    {
+                        id: generateId(),
+                        name: 'The Rhodes Harbor',
+                        items: [
+                            { id: generateId(), text: 'Colossus of Rhodes', emoji: '🗿', createdAt: new Date().toISOString(), nextReview: new Date().toISOString(), level: 0, correct: 0, incorrect: 0 }
+                        ]
+                    },
+                    {
+                        id: generateId(),
+                        name: 'The Anatolia Plain',
+                        items: [
+                            { id: generateId(), text: 'Mausoleum at Halicarnassus', emoji: '🏛️', createdAt: new Date().toISOString(), nextReview: new Date().toISOString(), level: 0, correct: 0, incorrect: 0 }
+                        ]
+                    },
+                    {
+                        id: generateId(),
+                        name: 'The Greek Temple',
+                        items: [
+                            { id: generateId(), text: 'Statue of Zeus at Olympia', emoji: '⚡', createdAt: new Date().toISOString(), nextReview: new Date().toISOString(), level: 0, correct: 0, incorrect: 0 }
+                        ]
+                    },
+                    {
+                        id: generateId(),
+                        name: 'The Pharos Lighthouse',
+                        items: [
+                            { id: generateId(), text: 'Lighthouse of Alexandria', emoji: '🔦', createdAt: new Date().toISOString(), nextReview: new Date().toISOString(), level: 0, correct: 0, incorrect: 0 }
+                        ]
+                    },
+                    {
+                        id: generateId(),
+                        name: 'The Hanging Gardens',
+                        items: [
+                            { id: generateId(), text: 'Hanging Gardens of Babylon', emoji: '🌿', createdAt: new Date().toISOString(), nextReview: new Date().toISOString(), level: 0, correct: 0, incorrect: 0 }
+                        ]
+                    },
+                    {
+                        id: generateId(),
+                        name: 'The Roman Amphitheater',
+                        items: [
+                            { id: generateId(), text: 'Colosseum of Rome', emoji: '🎭', createdAt: new Date().toISOString(), nextReview: new Date().toISOString(), level: 0, correct: 0, incorrect: 0 }
+                        ]
+                    }
+                ],
+                createdAt: new Date().toISOString(),
+                stats: { itemsRevealed: 0, itemsMastered: 0, streak: 0 }
+            };
+
+            const palaces = getPalaces();
+            if (!palaces.find(p => p.name === demoData.name)) {
+                palaces.push(demoData);
+                savePalaces(palaces);
+                renderPalaces();
+                updateStats();
+            }
+        }
+    </script>
+</body>
+</html>
